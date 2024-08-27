@@ -7,12 +7,11 @@ This guide will help you set up your environment by downloading the required Ard
 To successfully run this project, you will need to download and install the following Arduino libraries:
 
 1. **Adafruit_DotStar**
-2. **Arduino_APDS9960**
-3. **Arduino_LPS22HB**
-4. **Arduino_LSM9DS1**
-5. **ArduinoBLE**
-6. **SD**
-7. **SparkFun_u-blox_GNSS_Arduino_Library**
+2. **sensirion-sps**
+3. **Arduino_HS300x**
+4. **ArduinoBLE**
+5. **SD**
+6. **SparkFun_u-blox_GNSS_Arduino_Library**
 
 ## Installation Instructions
 
