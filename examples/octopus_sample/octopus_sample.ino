@@ -1,4 +1,4 @@
-#include "Octopus_Firware.h"
+#include "Octopus_Firmware.h"
 
 unsigned long previousMillis = 0;
 const long interval = 5000; // Interval in milliseconds
