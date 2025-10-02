@@ -1,15 +1,22 @@
-#ifndef OCTOPUS_H
-#define OCTOPUS_H
+#ifndef OCTOPUS_FIRMWARE_H
+#define OCTOPUS_FIRMWARE_H
 
+#include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <SD.h>
 #include <Arduino_HS300x.h>
 #include <Adafruit_DotStar.h>
-#include <sps30.h> // Include the SPS30 library
 #include <SparkFun_u-blox_GNSS_Arduino_Library.h>
+#include <SensirionI2cSps30.h>
+#include <RTC_RX8025NB.h>
+#include <TimeLib.h>
 
-// Define the SD classes
+#ifndef ENABLE_RTC_CONSOLE
+#define ENABLE_RTC_CONSOLE 0
+#endif
+
+// ---------------- SD Logging ----------------
 class SDLogging {
 public:
     SDLogging(int csPin, int recordsPerFile);
@@ -24,6 +31,7 @@ private:
     void createNewFile();
 };
 
+// ---------------- Octopus Core ----------------
 class Octopus {
 public:
     static bool initializeSensors();
@@ -32,25 +40,48 @@ public:
     static float readTemperature();
     static float readHumidity();
 
-    // SPS30 Functions
-    static bool initializeSPS30(); // Add function for initializing SPS30
-    static bool readSPS30Data(float &pm1_0, float &pm2_5, float &pm4_0, float &pm10_0); // Add function for reading SPS30 data
-    static bool stopSPS30(); // Add function to stop SPS30 measurement
+    // SPS30
+    static bool initializeSPS30(); // safe to call multiple times; ignores if already active
+    static bool readSPS30Data(float &pm1_0, float &pm2_5, float &pm4_0, float &pm10_0);
+    static bool stopSPS30();
+    static bool restartSPS30(); // force a full stop/start
 
-    // GPS Functions
-    static bool initializeGPS(); // Initialize GPS
-    static bool readGPSData(float &latitude, float &longitude, float &altitude); // Read GPS data
-    static String getGPSTime(); // Get GPS time as a string
+    // GPS
+    static bool initializeGPS();
+    static bool readGPSData(float &latitude, float &longitude, float &altitude);
+    static String getGPSTime();
 
+    // RTC
+    static bool initializeRTC();
+    static String getTimestamp();
+    static bool rtcInitialized;
+
+private:
+    static bool triedInitialRead;
+
+    // ----SPS30 State----
+    static bool  sps30Active;
+    static bool  sps30Starting;
+    static unsigned long sps30StartMillis;
+    static const unsigned long SPS30_WARMUP_MS = 3000UL;
+    static uint8_t notReadyStreak;
+    static unsigned long lastNotReadyReport;
+    static const unsigned long NOT_READY_REPORT_INTERVAL_MS = 2000UL;
+    static const uint8_t NOT_READY_RESTART_THRESHOLD = 10; // consecutive not-ready after warm-up triggers restart
 };
 
-// Battery and LED control functions
+// Battery / LED
 void initBatteryMonitoring();
 float calculateBatteryPercentage(float voltage);
 void setDotStarColor(uint8_t r, uint8_t g, uint8_t b);
 
-// Functions for SD Card Handling
+// SD helpers
 void initSD(int recordsPerFile);
 void logToSD(String data);
 
-#endif // OCTOPUS_H
+// Globals
+extern SFE_UBLOX_GNSS myGPS;
+extern SensirionI2cSps30 sps30;
+extern RTC_RX8025NB rtc;
+
+#endif // OCTOPUS_FIRMWARE_H
