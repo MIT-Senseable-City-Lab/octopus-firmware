@@ -13,8 +13,10 @@ The Octopus Firmware Library provides easy-to-use functions and examples to help
 When prompted to install the required dependencies, select "Install all." (Note: If you have previously installed the necessary dependencies, this prompt may not appear.)
 Install these additional libraries from the Arduino Library Manager:
 - **Adafruit_DotStar**
-- **sensirion-sps**
+- **Sensirion I2C SPS30**
 - **Arduino_HS300x**
+- **Time**
+- **RTC_RX8025NB**
 - **ArduinoBLE**
 - **SD**
 - **SparkFun_u-blox_GNSS_Arduino_Library**
